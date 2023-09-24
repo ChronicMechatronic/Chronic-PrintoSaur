@@ -1,0 +1,50 @@
+/*example sketch for controlling the speed of any bipolar or unipolar stepper motor bidirectionally via a potentiometer,
+using the A9488 stepper motor driver.
+Wiring like in this tutorial: https://www.makerguides.com/a4988-stepper-motor-driver-arduino-tutorial/
+To connect unipolar motors with five wires, you'll need to cut the PCB trace connecting the center taps of both coils like this:
+https://chapelierfou.org/blog/converting-a-unipolar-stepper-to-bipolar.html
+Then you can ignore that wire and hook your driver to the remaining four. On six wire motors just ignore the center tap connections.
+Chronic Mechatronic 10/19/2022
+ */
+
+// Include the AccelStepper library:
+#include <AccelStepper.h>
+
+// Define stepper motor connections, you can change those to any other IO pin you like
+#define dirPin 2  //decides the rotation direction CW or CCW o the motor
+#define stepPin 3 //this pin puts out the pulses for stepping the motor
+#define potPin A0 //Analog input pin for the potentiometer
+
+#define MaximumSpeed 5000 //defines the maximum number of pulses put out per second to drive the motor. Change to whatever best suits your needs
+
+#define motorInterfaceType 1 // Define stepper motor interface type. Must be set to 1 when using a driver
+
+int analogReadout = 0;  //some variables
+int stepperSpeed = 0;
+
+
+AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin); // Create a new instance of the AccelStepper class
+
+void setup() {
+  Serial.begin(9600);
+  
+  stepper.setMaxSpeed(MaximumSpeed); // Set the maximum speed in steps per second
+  pinMode(stepPin, OUTPUT);
+  pinMode(dirPin, OUTPUT);
+  pinMode(potPin, INPUT);
+}
+
+void loop() {
+
+  analogReadout = (analogRead(potPin)); //Read potentiometer values
+
+  stepperSpeed = map(analogReadout,0,1023,-MaximumSpeed,MaximumSpeed); //Map potentiometer values to step pulses per second
+
+  if(stepperSpeed<50&&stepperSpeed>-50) {stepperSpeed=0;}  //Flatten the lowest speeds to zero in order to get the motor to stop before reversing direction
+  //change the "50" to some other value if you want a wider zero spot
+  
+  // Set the speed in steps per second:
+  stepper.setSpeed(stepperSpeed);
+  // Step the motor with a constant speed as set by setSpeed():
+  stepper.runSpeed();
+}
