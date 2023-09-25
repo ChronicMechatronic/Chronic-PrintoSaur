@@ -1,0 +1,31 @@
+/*simple sketch for controlling any bipolar or unipolar stepper motor at one step (or microstep) every two seconds,
+using the A9488 stepper motor driver.
+Wiring like in this tutorial: https://www.makerguides.com/a4988-stepper-motor-driver-arduino-tutorial/
+Depending on your microstepping setting on the A4988 the motor will either do one full, quarter, eighth, or sixteenth step every two seconds,
+useful for determining the quality of salvaged stepper motors
+
+Chronic Mechatronic 08/03/2023
+ */
+
+
+#define dirPin 2
+#define stepPin 3
+
+
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(stepPin, OUTPUT);
+  pinMode(dirPin, OUTPUT);
+
+}
+
+void loop() {
+
+  digitalWrite(stepPin, HIGH);
+  delay(2);
+  digitalWrite(stepPin, LOW);
+  delay(2);
+
+  delay(2000);
+}
